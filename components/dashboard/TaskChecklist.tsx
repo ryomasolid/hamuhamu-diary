@@ -55,11 +55,6 @@ function TaskItem({
       <Text variant="label" style={{ marginLeft: spacing.sm }}>
         {task.emoji} {task.label}
       </Text>
-      {task.completed && (
-        <View
-          style={[styles.strikeThrough, { backgroundColor: colors.textTertiary }]}
-        />
-      )}
     </Pressable>
   );
 }
@@ -143,14 +138,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  strikeThrough: {
-    position: 'absolute',
-    left: 40,
-    right: spacing.sm,
-    height: 1,
-    top: '50%',
-    opacity: 0.4,
   },
   allDone: {
     marginTop: spacing.md,

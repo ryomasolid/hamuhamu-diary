@@ -54,6 +54,26 @@ export function useAddRecord() {
   });
 }
 
+export function useUpdateRecord() {
+  const queryClient = useQueryClient();
+  const updateRecord = useRecordStore((s) => s.updateRecord);
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      updates,
+    }: {
+      id: string;
+      updates: Partial<Omit<DailyRecord, 'id' | 'createdAt'>>;
+    }) => {
+      updateRecord(id, updates);
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: RECORDS_KEY });
+    },
+  });
+}
+
 export function useDeleteRecord() {
   const queryClient = useQueryClient();
   const deleteRecord = useRecordStore((s) => s.deleteRecord);

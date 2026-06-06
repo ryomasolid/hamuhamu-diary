@@ -1,8 +1,8 @@
 import React from 'react';
-import { Pressable, StyleSheet, View, useColorScheme, Alert } from 'react-native';
+import { Image, Pressable, StyleSheet, View, useColorScheme, Alert } from 'react-native';
 import { format, parseISO } from 'date-fns';
 import { ja } from 'date-fns/locale/ja';
-import { getColors, spacing } from '@/constants/theme';
+import { getColors, spacing, radii } from '@/constants/theme';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Text } from '@/components/ui/Text';
@@ -13,9 +13,10 @@ interface RecordCardProps {
   record: DailyRecord;
   cleaningOptions: CleaningOption[];
   onDelete: (id: string) => void;
+  onPress?: () => void;
 }
 
-export function RecordCard({ record, cleaningOptions, onDelete }: RecordCardProps) {
+export function RecordCard({ record, cleaningOptions, onDelete, onPress }: RecordCardProps) {
   const scheme = useColorScheme();
   const colors = getColors(scheme);
 
@@ -37,24 +38,47 @@ export function RecordCard({ record, cleaningOptions, onDelete }: RecordCardProp
   };
 
   return (
-    <Pressable onLongPress={handleLongPress} delayLongPress={500}>
+    <Pressable
+      onPress={onPress}
+      onLongPress={handleLongPress}
+      delayLongPress={500}
+      style={({ pressed }) => [pressed && onPress ? { opacity: 0.75 } : undefined]}
+    >
       <Card style={styles.card}>
         {/* ヘッダー: 日付 + 体重 */}
         <View style={styles.header}>
           <Text variant="label" weight="semibold" color={colors.textSecondary}>
             {formattedDate}
           </Text>
-          {record.weight != null && (
-            <View style={styles.weightBadge}>
-              <Text variant="h4" weight="bold" color={colors.primary}>
-                {record.weight}
+          <View style={styles.headerRight}>
+            {record.weight != null && (
+              <View style={styles.weightBadge}>
+                <Text variant="h4" weight="bold" color={colors.primary}>
+                  {record.weight}
+                </Text>
+                <Text variant="caption" color={colors.textSecondary} style={{ marginLeft: 2 }}>
+                  g
+                </Text>
+              </View>
+            )}
+            {onPress && (
+              <Text variant="caption" color={colors.textTertiary} style={{ marginLeft: spacing.sm }}>
+                ›
               </Text>
-              <Text variant="caption" color={colors.textSecondary} style={{ marginLeft: 2 }}>
-                g
-              </Text>
-            </View>
-          )}
+            )}
+          </View>
         </View>
+
+        {/* 写真 */}
+        {record.photoUri != null && (
+          <View style={[styles.section, { borderTopColor: colors.border }]}>
+            <Image
+              source={{ uri: record.photoUri }}
+              style={[styles.photo, { borderRadius: radii.md }]}
+              resizeMode="cover"
+            />
+          </View>
+        )}
 
         {/* ごはん */}
         {record.food.length > 0 && (
@@ -105,6 +129,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   weightBadge: {
     flexDirection: 'row',
     alignItems: 'baseline',
@@ -122,5 +150,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.xs,
+  },
+  photo: {
+    width: '100%',
+    height: 180,
   },
 });

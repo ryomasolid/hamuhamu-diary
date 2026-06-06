@@ -9,7 +9,7 @@ import {
   useColorScheme,
   Alert,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import type { Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -27,8 +27,9 @@ import { WeightInput } from '@/components/record/WeightInput';
 import { FoodInput } from '@/components/record/FoodInput';
 import { CleaningInput } from '@/components/record/CleaningInput';
 import { MemoInput } from '@/components/record/MemoInput';
-import { useAddRecord } from '@/hooks/useRecords';
+import { useAddRecord, useUpdateRecord } from '@/hooks/useRecords';
 import { usePresetMeals, useSingleFoods, useCleaningOptions } from '@/hooks/useProfile';
+import { useRecordStore } from '@/store/recordStore';
 
 const recordSchema = z.object({
   date: z.string().min(1, '日付を選択してください'),
@@ -67,7 +68,15 @@ function FormSection({ title, children }: FormSectionProps) {
 export default function RecordScreen() {
   const scheme = useColorScheme();
   const colors = getColors(scheme);
-  const { mutate: addRecord, isPending } = useAddRecord();
+  const { id } = useLocalSearchParams<{ id?: string }>();
+
+  const records = useRecordStore((s) => s.records);
+  const existingRecord = id ? (records.find((r) => r.id === id) ?? null) : null;
+  const isEditing = existingRecord !== null;
+
+  const { mutate: addRecord, isPending: isAdding } = useAddRecord();
+  const { mutate: updateRecord, isPending: isUpdating } = useUpdateRecord();
+  const isPending = isAdding || isUpdating;
   const presetMeals = usePresetMeals();
   const singleFoods = useSingleFoods();
   const cleaningOptions = useCleaningOptions();
@@ -81,18 +90,55 @@ export default function RecordScreen() {
   } = useForm<RecordFormData>({
     // zodResolver + exactOptionalPropertyTypes: type cast required for compatibility
     resolver: zodResolver(recordSchema) as unknown as Resolver<RecordFormData>,
-    defaultValues: {
-      date: format(new Date(), 'yyyy-MM-dd'),
-      weight: '',
-      food: '',
-      cleaningTaskIds: [],
-      memo: '',
-      photoUri: null,
-    },
+    defaultValues: existingRecord
+      ? {
+          date: existingRecord.date,
+          weight: existingRecord.weight != null ? String(existingRecord.weight) : '',
+          food: existingRecord.food,
+          cleaningTaskIds: existingRecord.cleaningTaskIds,
+          memo: existingRecord.memo,
+          photoUri: existingRecord.photoUri,
+        }
+      : {
+          date: format(new Date(), 'yyyy-MM-dd'),
+          weight: '',
+          food: '',
+          cleaningTaskIds: [],
+          memo: '',
+          photoUri: null,
+        },
   });
 
   const onSubmit = (values: RecordFormData) => {
     const weight = values.weight !== '' ? parseFloat(values.weight) : null;
+
+    if (isEditing && existingRecord) {
+      updateRecord(
+        {
+          id: existingRecord.id,
+          updates: {
+            date: values.date,
+            weight,
+            food: values.food,
+            cleaningTaskIds: values.cleaningTaskIds,
+            memo: values.memo,
+            photoUri: values.photoUri,
+          },
+        },
+        {
+          onSuccess: () => {
+            void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            Alert.alert('更新しました！', `${values.date} の記録を更新しました。`, [
+              { text: 'OK', onPress: () => router.back() },
+            ]);
+          },
+          onError: () => {
+            Alert.alert('エラー', '記録の更新に失敗しました。もう一度お試しください。');
+          },
+        },
+      );
+      return;
+    }
 
     const record = {
       id: `record-${Date.now()}`,
@@ -146,7 +192,7 @@ export default function RecordScreen() {
             </Text>
           </Pressable>
           <Text variant="h4" weight="bold">
-            記録する 📝
+            {isEditing ? '記録を編集 ✏️' : '記録する 📝'}
           </Text>
           <View style={styles.headerBtn} />
         </View>
@@ -234,7 +280,7 @@ export default function RecordScreen() {
           {/* 保存ボタン */}
           <View style={[styles.saveArea, { borderRadius: radii.lg }]}>
             <Button
-              label="💾 保存する"
+              label={isEditing ? '💾 更新する' : '💾 保存する'}
               variant="solid"
               colorScheme="primary"
               size="lg"
@@ -263,7 +309,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.lg,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   headerBtn: {

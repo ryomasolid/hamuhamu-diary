@@ -38,6 +38,9 @@ export default function RootLayout() {
               contentStyle: { backgroundColor: colors.background },
             }}
           />
+          <Stack.Screen name="settings-cleaning" options={{ headerShown: false }} />
+          <Stack.Screen name="settings-meals" options={{ headerShown: false }} />
+          <Stack.Screen name="settings-foods" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
         </Stack>
       </SafeAreaProvider>

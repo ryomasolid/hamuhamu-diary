@@ -1,6 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Alert,
+  Image,
+  Pressable,
   ScrollView,
   StyleSheet,
   TextInput,
@@ -12,6 +14,7 @@ import type { Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { format } from 'date-fns';
+import * as ImagePicker from 'expo-image-picker';
 import { getColors, fontSizes, radii, spacing } from '@/constants/theme';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
@@ -71,9 +74,71 @@ function FormField({
   );
 }
 
+function PhotoPicker({
+  photoUri,
+  onChange,
+}: {
+  photoUri: string | null;
+  onChange: (uri: string | null) => void;
+}) {
+  const scheme = useColorScheme();
+  const colors = getColors(scheme);
+
+  const pickPhoto = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('権限が必要です', 'カメラロールへのアクセスを許可してください。');
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+    if (!result.canceled && result.assets[0]) {
+      onChange(result.assets[0].uri);
+    }
+  };
+
+  const removePhoto = () => {
+    Alert.alert('写真を削除', 'プロフィール写真を削除しますか？', [
+      { text: 'キャンセル', style: 'cancel' },
+      { text: '削除', style: 'destructive', onPress: () => onChange(null) },
+    ]);
+  };
+
+  return (
+    <View style={styles.photoPickerWrap}>
+      <Pressable
+        onPress={pickPhoto}
+        onLongPress={photoUri != null ? removePhoto : undefined}
+        style={[
+          styles.photoCircle,
+          {
+            backgroundColor: colors.surfaceSecondary,
+            borderColor: colors.border,
+          },
+        ]}
+      >
+        {photoUri != null ? (
+          <Image source={{ uri: photoUri }} style={styles.photoImage} />
+        ) : (
+          <Text style={styles.photoEmoji}>🐹</Text>
+        )}
+      </Pressable>
+      <Text variant="caption" color={colors.textSecondary} style={{ marginTop: spacing.xs }}>
+        {photoUri != null ? 'タップで変更・長押しで削除' : 'タップして写真を設定'}
+      </Text>
+    </View>
+  );
+}
+
 export function ProfileForm({ profile, onSave, isSaving }: ProfileFormProps) {
   const scheme = useColorScheme();
   const colors = getColors(scheme);
+
+  const [photoUri, setPhotoUri] = useState<string | null>(profile?.photoUri ?? null);
 
   const today = format(new Date(), 'yyyy-MM-dd');
 
@@ -99,6 +164,7 @@ export function ProfileForm({ profile, onSave, isSaving }: ProfileFormProps) {
       setValue('species', profile.species);
       setValue('birthDate', profile.birthDate ?? today);
       setValue('welcomeDate', profile.welcomeDate ?? today);
+      setPhotoUri(profile.photoUri);
     }
   }, [profile, setValue, today]);
 
@@ -110,13 +176,15 @@ export function ProfileForm({ profile, onSave, isSaving }: ProfileFormProps) {
       species: values.species,
       birthDate: values.birthDate,
       welcomeDate: values.welcomeDate,
-      photoUri: profile?.photoUri ?? null,
+      photoUri,
     });
     Alert.alert('保存しました', 'プロフィールを保存しました。');
   };
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
+      <PhotoPicker photoUri={photoUri} onChange={setPhotoUri} />
+
       <FormField label="名前" required error={errors.name?.message}>
         <Controller
           control={control}
@@ -234,5 +302,36 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: spacing.xs,
     marginTop: spacing.sm,
+  },
+  photoPickerWrap: {
+    alignItems: 'center',
+    marginBottom: spacing.lg,
+  },
+  photoCircle: {
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  photoImage: {
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+  },
+  photoEmoji: {
+    fontSize: 20,
+  },
+  photoBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

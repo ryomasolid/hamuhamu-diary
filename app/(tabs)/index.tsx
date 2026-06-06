@@ -1,19 +1,18 @@
-import React from 'react';
-import { Pressable, ScrollView, StyleSheet, View, useColorScheme } from 'react-native';
+import React, { useMemo } from 'react';
+import { Image, Pressable, ScrollView, StyleSheet, View, useColorScheme } from 'react-native';
 import { router } from 'expo-router';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { ja } from 'date-fns/locale/ja';
 import * as Haptics from 'expo-haptics';
-import { getColors, spacing, AD_BANNER_HEIGHT } from '@/constants/theme';
+import { getColors, radii, spacing, AD_BANNER_HEIGHT } from '@/constants/theme';
 import { AdBanner } from '@/components/ui/AdBanner';
 import { Card } from '@/components/ui/Card';
 import { Text } from '@/components/ui/Text';
-import { TaskChecklist } from '@/components/dashboard/TaskChecklist';
 import { StatusSummary } from '@/components/dashboard/StatusSummary';
-import { useTasks } from '@/hooks/useTasks';
-import { useLatestRecord } from '@/hooks/useRecords';
+import { useLatestRecord, useRecords } from '@/hooks/useRecords';
 import { useProfile } from '@/hooks/useProfile';
 import { useRecordStore } from '@/store/recordStore';
+import type { DailyRecord } from '@/types';
 
 function RecordButton() {
   const scheme = useColorScheme();
@@ -45,16 +44,61 @@ function RecordButton() {
   );
 }
 
+function PhotoMemory({ record }: { record: DailyRecord }) {
+  const scheme = useColorScheme();
+  const colors = getColors(scheme);
+
+  const dateLabel = format(parseISO(record.date), 'yyyy年M月d日（EEE）', { locale: ja });
+
+  return (
+    <View>
+      <Text variant="label" weight="semibold" style={{ marginBottom: spacing.sm }}>
+        📸 思い出フォト
+      </Text>
+      <Pressable
+        onPress={() =>
+          router.push({ pathname: '/record', params: { id: record.id } })
+        }
+        style={({ pressed }) => [{ opacity: pressed ? 0.9 : 1 }]}
+      >
+        <View style={[styles.photoCard, { borderRadius: radii.lg, backgroundColor: colors.surfaceSecondary }]}>
+          <Image
+            source={{ uri: record.photoUri! }}
+            style={[styles.photoImage, { borderRadius: radii.lg }]}
+            resizeMode="cover"
+          />
+          <View style={[styles.photoOverlay, { borderRadius: radii.lg }]}>
+            <Text variant="caption" color="#FFFFFF" weight="medium">
+              {dateLabel}
+            </Text>
+            {record.memo.length > 0 && (
+              <Text variant="caption" color="rgba(255,255,255,0.85)" numberOfLines={1}>
+                {record.memo}
+              </Text>
+            )}
+          </View>
+        </View>
+      </Pressable>
+    </View>
+  );
+}
+
 export default function DashboardScreen() {
   const scheme = useColorScheme();
   const colors = getColors(scheme);
-  const { tasks, completedCount, totalCount, isLoading: tasksLoading, toggleTask } = useTasks();
   const { record: latestRecord, isLoading: recordLoading } = useLatestRecord();
+  const { records } = useRecords();
   const { profile } = useProfile();
   const getLastCleaningDate = useRecordStore((s) => s.getLastCleaningDate);
 
   const today = format(new Date(), 'yyyy年M月d日（EEE）', { locale: ja });
   const greeting = profile?.name ? `${profile.name}の今日のお世話` : '今日のお世話';
+
+  const randomPhotoRecord = useMemo(() => {
+    const withPhotos = records.filter((r) => r.photoUri != null);
+    if (withPhotos.length === 0) return null;
+    return withPhotos[Math.floor(Math.random() * withPhotos.length)] ?? null;
+  }, [records]);
 
   return (
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
@@ -67,25 +111,37 @@ export default function DashboardScreen() {
       >
         {/* ヘッダーセクション */}
         <View style={styles.hero}>
-          <Text variant="caption" color={colors.textSecondary}>
-            {today}
-          </Text>
-          <Text variant="h3" weight="bold" style={{ marginTop: spacing.xs }}>
-            {greeting} 🐹
-          </Text>
+          <View style={styles.heroText}>
+            <Text variant="caption" color={colors.textSecondary}>
+              {today}
+            </Text>
+            <Text variant="h3" weight="bold" style={{ marginTop: spacing.xs }}>
+              {greeting}
+            </Text>
+          </View>
+          {profile != null && (
+            <View
+              style={[
+                styles.heroAvatar,
+                { backgroundColor: colors.surfaceSecondary, borderColor: colors.border },
+              ]}
+            >
+              {profile.photoUri != null ? (
+                <Image source={{ uri: profile.photoUri }} style={styles.heroAvatarImage} />
+              ) : (
+                <Text style={styles.heroAvatarEmoji}>🐹</Text>
+              )}
+            </View>
+          )}
         </View>
 
         {/* クイック記録ボタン */}
         <RecordButton />
 
-        {/* タスクチェックリスト */}
-        <TaskChecklist
-          tasks={tasks}
-          completedCount={completedCount}
-          totalCount={totalCount}
-          isLoading={tasksLoading}
-          onToggle={toggleTask}
-        />
+        {/* 思い出フォト */}
+        {randomPhotoRecord != null && (
+          <PhotoMemory record={randomPhotoRecord} />
+        )}
 
         {/* ステータスサマリー */}
         <StatusSummary
@@ -130,10 +186,53 @@ const styles = StyleSheet.create({
   },
   hero: {
     paddingTop: spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  heroText: {
+    flex: 1,
+  },
+  heroAvatar: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+    marginLeft: spacing.md,
+  },
+  heroAvatarImage: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+  },
+  heroAvatarEmoji: {
+    fontSize: 28,
   },
   recordBtn: {
     padding: spacing.md,
     alignItems: 'center',
+  },
+  photoCard: {
+    width: '100%',
+    aspectRatio: 4 / 3,
+    overflow: 'hidden',
+  },
+  photoImage: {
+    width: '100%',
+    height: '100%',
+  },
+  photoOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    gap: 2,
   },
   setupCard: {
     gap: spacing.sm,

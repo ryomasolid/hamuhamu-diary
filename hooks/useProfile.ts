@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useProfileStore } from '@/store/profileStore';
 import type { HamsterProfile } from '@/types';
 
@@ -53,4 +53,28 @@ export function useSingleFoods() {
 
 export function useCleaningOptions() {
   return useProfileStore((s) => s.cleaningOptions);
+}
+
+export function useManagePresetMeals() {
+  const add = useProfileStore((s) => s.addPresetMeal);
+  const update = useProfileStore((s) => s.updatePresetMeal);
+  const remove = useProfileStore((s) => s.removePresetMeal);
+  const reorder = useProfileStore((s) => s.setPresetMeals);
+  return { add, update, remove, reorder };
+}
+
+export function useManageSingleFoods() {
+  const add = useProfileStore((s) => s.addSingleFood);
+  const update = useProfileStore((s) => s.updateSingleFood);
+  const remove = useProfileStore((s) => s.removeSingleFood);
+  const reorder = useProfileStore((s) => s.setSingleFoods);
+  return { add, update, remove, reorder };
+}
+
+export function useManageCleaningOptions() {
+  const add = useProfileStore((s) => s.addCleaningOption);
+  const update = useProfileStore((s) => s.updateCleaningOption);
+  const remove = useProfileStore((s) => s.removeCleaningOption);
+  const reorder = useProfileStore((s) => s.setCleaningOptions);
+  return { add, update, remove, reorder };
 }

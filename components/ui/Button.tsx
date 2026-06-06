@@ -52,7 +52,7 @@ export function Button({
     if (colorScheme === 'success') return colors.success;
     if (colorScheme === 'warning') return colors.warning;
     if (colorScheme === 'error') return colors.error;
-    return colors.border;
+    return colors.textSecondary;
   };
 
   const accentColor = resolveColor();

@@ -84,6 +84,7 @@ export default function DiaryScreen() {
         record={item}
         cleaningOptions={cleaningOptions}
         onDelete={handleDelete}
+        onPress={() => router.push({ pathname: '/record', params: { id: item.id } })}
       />
     ),
     [cleaningOptions, handleDelete],

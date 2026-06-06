@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, View, useColorScheme } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, View, useColorScheme } from 'react-native';
+import { router } from 'expo-router';
 import { differenceInMonths, differenceInYears, parseISO } from 'date-fns';
 import { getColors, radii, spacing, AD_BANNER_HEIGHT } from '@/constants/theme';
 import { AdBanner } from '@/components/ui/AdBanner';
@@ -44,7 +45,14 @@ function ProfileHeaderCard({
             { backgroundColor: colors.surfaceSecondary, borderRadius: radii.full },
           ]}
         >
-          <Text style={{ fontSize: 40 }}>🐹</Text>
+          {profile.photoUri != null ? (
+            <Image
+              source={{ uri: profile.photoUri }}
+              style={styles.avatarImage}
+            />
+          ) : (
+            <Text style={{ fontSize: 20 }}>🐹</Text>
+          )}
         </View>
         <View style={styles.profileInfo}>
           <Text variant="h3" weight="bold">
@@ -155,6 +163,30 @@ export default function ProfileScreen() {
           <ProfileHeaderCard profile={profile} onEdit={() => setIsEditing(true)} />
         )}
 
+        {/* カスタマイズ設定へのリンク */}
+        <Pressable
+          onPress={() => router.push('/(tabs)/settings')}
+          style={({ pressed }) => [
+            styles.settingsLink,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+              borderRadius: radii.md,
+              opacity: pressed ? 0.7 : 1,
+            },
+          ]}
+        >
+          <Text variant="label" weight="semibold">
+            ⚙️ カスタマイズ設定
+          </Text>
+          <Text variant="caption" color={colors.textSecondary}>
+            お掃除項目・献立・フードを編集
+          </Text>
+          <Text variant="h4" color={colors.textTertiary} style={styles.chevron}>
+            ›
+          </Text>
+        </Pressable>
+
         {/* リマインダーセクション */}
         <View>
           <Text variant="h4" weight="semibold" style={{ marginBottom: spacing.sm }}>
@@ -204,6 +236,12 @@ const styles = StyleSheet.create({
     height: 64,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
   },
   profileInfo: {
     flex: 1,
@@ -218,5 +256,15 @@ const styles = StyleSheet.create({
   },
   infoItem: {
     gap: 2,
+  },
+  settingsLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: spacing.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    gap: spacing.xs,
+  },
+  chevron: {
+    marginLeft: 'auto',
   },
 });
