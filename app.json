@@ -8,8 +8,9 @@
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true,
       "bundleIdentifier": "com.ryomasolid.hamuhamudiary",
+      "buildNumber": "1",
+      "supportsTablet": true,
       "infoPlist": {
         "CFBundleDisplayName": "はむ日記",
         "ITSAppUsesNonExemptEncryption": false
