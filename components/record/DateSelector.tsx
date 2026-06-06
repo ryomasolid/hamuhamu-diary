@@ -18,7 +18,7 @@ import {
   parseISO,
   subDays,
 } from 'date-fns';
-import { ja } from 'date-fns/locale';
+import { ja } from 'date-fns/locale/ja';
 import { getColors, radii, spacing } from '@/constants/theme';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';

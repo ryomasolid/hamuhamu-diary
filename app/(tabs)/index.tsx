@@ -2,7 +2,7 @@ import React from 'react';
 import { Pressable, ScrollView, StyleSheet, View, useColorScheme } from 'react-native';
 import { router } from 'expo-router';
 import { format } from 'date-fns';
-import { ja } from 'date-fns/locale';
+import { ja } from 'date-fns/locale/ja';
 import * as Haptics from 'expo-haptics';
 import { getColors, spacing, AD_BANNER_HEIGHT } from '@/constants/theme';
 import { AdBanner } from '@/components/ui/AdBanner';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, View, useColorScheme, Alert } from 'react-native';
 import { format, parseISO } from 'date-fns';
-import { ja } from 'date-fns/locale';
+import { ja } from 'date-fns/locale/ja';
 import { getColors, spacing } from '@/constants/theme';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, useColorScheme } from 'react-native';
 import { format, parseISO } from 'date-fns';
-import { ja } from 'date-fns/locale';
+import { ja } from 'date-fns/locale/ja';
 import { getColors, radii, spacing } from '@/constants/theme';
 import { Card } from '@/components/ui/Card';
 import { Text } from '@/components/ui/Text';
