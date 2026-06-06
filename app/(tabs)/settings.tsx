@@ -51,19 +51,19 @@ export default function SettingsScreen() {
           emoji="🧹"
           label="お掃除項目"
           description="掃除メニューの追加・編集・並び替え"
-          onPress={() => router.push('/settings-cleaning')}
+          onPress={() => router.push('/settings/cleaning')}
         />
         <NavRow
           emoji="🌾"
           label="事前登録献立"
           description="1タップ入力できる献立テンプレート"
-          onPress={() => router.push('/settings-meals')}
+          onPress={() => router.push('/settings/meals')}
         />
         <NavRow
           emoji="🥕"
           label="単体フード"
           description="おやつ・追加フードの選択肢"
-          onPress={() => router.push('/settings-foods')}
+          onPress={() => router.push('/settings/foods')}
         />
       </Card>
 

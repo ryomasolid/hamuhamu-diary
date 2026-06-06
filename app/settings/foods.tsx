@@ -1,7 +1,9 @@
 import React, { useRef, useState } from 'react';
 import {
   Alert,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -57,37 +59,42 @@ function EditModal({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={styles.modalOverlay} onPress={onClose} />
-      <View style={[styles.modalSheet, { backgroundColor: colors.surface }]}>
-        <Text variant="h4" weight="bold" style={{ marginBottom: spacing.md }}>
-          {isNew ? 'フードを追加' : 'フードを編集'}
-        </Text>
+    <Modal visible={visible} transparent animationType="none" onRequestClose={onClose}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.modalContainer}
+      >
+        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+        <View style={[styles.modalSheet, { backgroundColor: colors.surface }]}>
+          <Text variant="h4" weight="bold" style={{ marginBottom: spacing.md }}>
+            {isNew ? 'フードを追加' : 'フードを編集'}
+          </Text>
 
-        <TextInput
-          value={name}
-          onChangeText={setName}
-          placeholder="フード名（例: チーズ）"
-          placeholderTextColor={colors.textTertiary}
-          style={[
-            styles.textField,
-            { backgroundColor: colors.surfaceSecondary, color: colors.text, borderColor: colors.border, borderRadius: radii.sm, fontSize: fontSizes.md, marginBottom: spacing.md },
-          ]}
-          returnKeyType="done"
-          onSubmitEditing={handleSave}
-          autoFocus
-        />
+          <TextInput
+            value={name}
+            onChangeText={setName}
+            placeholder="フード名（例: チーズ）"
+            placeholderTextColor={colors.textTertiary}
+            style={[
+              styles.textField,
+              { backgroundColor: colors.surfaceSecondary, color: colors.text, borderColor: colors.border, borderRadius: radii.sm, fontSize: fontSizes.md, marginBottom: spacing.md },
+            ]}
+            returnKeyType="done"
+            onSubmitEditing={handleSave}
+            autoFocus
+          />
 
-        <View style={styles.modalActions}>
-          {!isNew && onDelete && (
-            <Button label="削除" variant="outline" colorScheme="error" size="md" onPress={handleDelete} />
-          )}
-          <View style={styles.modalActionsRight}>
-            <Button label="キャンセル" variant="ghost" colorScheme="gray" size="md" onPress={onClose} />
-            <Button label={isNew ? '追加' : '保存'} variant="solid" colorScheme="primary" size="md" onPress={handleSave} />
+          <View style={styles.modalActions}>
+            {!isNew && onDelete && (
+              <Button label="削除" variant="outline" colorScheme="error" size="md" onPress={handleDelete} />
+            )}
+            <View style={styles.modalActionsRight}>
+              <Button label="キャンセル" variant="ghost" colorScheme="gray" size="md" onPress={onClose} />
+              <Button label={isNew ? '追加' : '保存'} variant="solid" colorScheme="primary" size="md" onPress={handleSave} />
+            </View>
           </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
@@ -213,12 +220,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    paddingHorizontal: spacing.lg,
+  },
   modalSheet: {
+    borderRadius: radii.lg,
     padding: spacing.lg,
-    paddingBottom: spacing.xl,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
   },
   textField: {
     height: 48,
