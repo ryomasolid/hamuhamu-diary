@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "はむはむ日記",
+    "slug": "hamuhamu-diary",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ryomasolid.hamuhamudiary",
+      "infoPlist": {
+        "CFBundleDisplayName": "はむ日記"
+      }
+    },
+    "plugins": [
+      "expo-dev-client",
+      "expo-router",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "ハムスターの写真を追加するためにカメラロールへのアクセスが必要です。"
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "af5e18e3-eeb2-41da-8484-082e5ae60d47"
+      }
+    }
+  }
+}
