@@ -7,12 +7,12 @@
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ryomasolid.hamuhamudiary",
       "infoPlist": {
-        "CFBundleDisplayName": "はむ日記"
+        "CFBundleDisplayName": "はむ日記",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "plugins": [
