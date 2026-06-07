@@ -1,8 +1,10 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Text } from './Text';
-import { AD_BANNER_HEIGHT } from '@/constants/theme';
+import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
+import { IOS_BANNER_AD_UNIT_ID } from '@/constants/ads';
+
+const adUnitId = __DEV__ ? TestIds.BANNER : IOS_BANNER_AD_UNIT_ID;
 
 interface AdBannerProps {
   respectSafeArea?: boolean;
@@ -18,24 +20,14 @@ export function AdBanner({ respectSafeArea = false }: AdBannerProps) {
         { paddingBottom: respectSafeArea ? insets.bottom : 0 },
       ]}
     >
-      <View style={[styles.banner, { height: AD_BANNER_HEIGHT }]}>
-        <Text variant="caption" color="#9E9E9E">
-          広告スペース（AdMob BannerAd）
-        </Text>
-      </View>
+      <BannerAd unitId={adUnitId} size={BannerAdSize.LARGE_ANCHORED_ADAPTIVE_BANNER} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#F0F0F0',
-  },
-  banner: {
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#E8E8E8',
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#CCCCCC',
+    backgroundColor: '#F0F0F0',
   },
 });

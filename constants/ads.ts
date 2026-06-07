@@ -1,0 +1,1 @@
+export const IOS_BANNER_AD_UNIT_ID = 'ca-app-pub-3362493734697220/2539095081';

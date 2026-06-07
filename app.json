@@ -9,11 +9,12 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "bundleIdentifier": "com.ryomasolid.hamuhamudiary",
-      "buildNumber": "1",
-      "supportsTablet": true,
+      "buildNumber": "2",
+      "supportsTablet": false,
       "infoPlist": {
         "CFBundleDisplayName": "はむ日記",
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSUserTrackingUsageDescription": "広告をあなたの興味に合わせて表示するために使用します。"
       }
     },
     "plugins": [
@@ -32,6 +33,12 @@
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
+        }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "iosAppId": "ca-app-pub-3362493734697220~7622911129"
         }
       ]
     ],
