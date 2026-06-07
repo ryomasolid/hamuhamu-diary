@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -17,7 +17,9 @@ import { z } from 'zod';
 import { format } from 'date-fns';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
+import { useInterstitialAd, TestIds } from 'react-native-google-mobile-ads';
 import { getColors, spacing, radii } from '@/constants/theme';
+import { IOS_INTERSTITIAL_AD_UNIT_ID } from '@/constants/ads';
 import { AdBanner } from '@/components/ui/AdBanner';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -30,6 +32,8 @@ import { MemoInput } from '@/components/record/MemoInput';
 import { useAddRecord, useUpdateRecord } from '@/hooks/useRecords';
 import { usePresetMeals, useSingleFoods, useCleaningOptions } from '@/hooks/useProfile';
 import { useRecordStore } from '@/store/recordStore';
+
+const INTERSTITIAL_AD_UNIT_ID = __DEV__ ? TestIds.INTERSTITIAL : IOS_INTERSTITIAL_AD_UNIT_ID;
 
 const recordSchema = z.object({
   date: z.string().min(1, '日付を選択してください'),
@@ -73,6 +77,19 @@ export default function RecordScreen() {
   const records = useRecordStore((s) => s.records);
   const existingRecord = id ? (records.find((r) => r.id === id) ?? null) : null;
   const isEditing = existingRecord !== null;
+
+  const { isLoaded: isAdLoaded, isClosed: isAdClosed, load: loadAd, show: showAd } =
+    useInterstitialAd(INTERSTITIAL_AD_UNIT_ID);
+
+  // 新規作成時のみ広告をプリロード
+  useEffect(() => {
+    if (!isEditing) loadAd();
+  }, []);
+
+  // 広告を閉じたら画面を閉じる
+  useEffect(() => {
+    if (isAdClosed) router.back();
+  }, [isAdClosed]);
 
   const { mutate: addRecord, isPending: isAdding } = useAddRecord();
   const { mutate: updateRecord, isPending: isUpdating } = useUpdateRecord();
@@ -155,9 +172,13 @@ export default function RecordScreen() {
     addRecord(record, {
       onSuccess: () => {
         void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        Alert.alert('記録しました！', `${values.date} の記録を保存しました。`, [
-          { text: 'OK', onPress: () => router.back() },
-        ]);
+        if (isAdLoaded) {
+          showAd(); // 広告を表示 → 閉じたら router.back()
+        } else {
+          Alert.alert('記録しました！', `${values.date} の記録を保存しました。`, [
+            { text: 'OK', onPress: () => router.back() },
+          ]);
+        }
       },
       onError: () => {
         Alert.alert('エラー', '記録の保存に失敗しました。もう一度お試しください。');

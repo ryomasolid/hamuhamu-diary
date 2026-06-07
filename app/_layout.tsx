@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -8,16 +8,30 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import mobileAds from 'react-native-google-mobile-ads';
 import { getColors } from '@/constants/theme';
 import { queryClient } from '@/lib/queryClient';
+import { useAppOpenAd } from '@/hooks/useAppOpenAd';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const scheme = useColorScheme();
   const colors = getColors(scheme);
+  const [adsReady, setAdsReady] = useState(false);
+
+  useAppOpenAd(adsReady);
 
   useEffect(() => {
-    mobileAds().initialize();
-    SplashScreen.hideAsync();
+    const init = async () => {
+      await mobileAds().setRequestConfiguration({
+        testDeviceIdentifiers: [
+          // 自分のデバイスIDをここに追加（Xcodeログに "To get test ads on this device" として表示される）
+          // 例: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+        ],
+      });
+      await mobileAds().initialize();
+      setAdsReady(true);
+      await SplashScreen.hideAsync();
+    };
+    void init();
   }, []);
 
   return (
