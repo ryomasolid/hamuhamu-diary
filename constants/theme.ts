@@ -164,7 +164,6 @@ export const shadows = {
   }),
 } as const;
 
-export const AD_BANNER_HEIGHT = 60;
 
 export function getColors(scheme: ColorSchemeName): ThemeColors {
   return scheme === 'dark' ? darkColors : lightColors;

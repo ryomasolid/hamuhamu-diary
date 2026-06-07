@@ -4,7 +4,8 @@ import { router } from 'expo-router';
 import { format, parseISO } from 'date-fns';
 import { ja } from 'date-fns/locale/ja';
 import * as Haptics from 'expo-haptics';
-import { getColors, radii, spacing, AD_BANNER_HEIGHT } from '@/constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getColors, radii, spacing } from '@/constants/theme';
 import { AdBanner } from '@/components/ui/AdBanner';
 import { Card } from '@/components/ui/Card';
 import { Text } from '@/components/ui/Text';
@@ -86,6 +87,7 @@ function PhotoMemory({ record }: { record: DailyRecord }) {
 export default function DashboardScreen() {
   const scheme = useColorScheme();
   const colors = getColors(scheme);
+  const insets = useSafeAreaInsets();
   const { record: latestRecord, isLoading: recordLoading } = useLatestRecord();
   const { records } = useRecords();
   const { profile } = useProfile();
@@ -105,7 +107,7 @@ export default function DashboardScreen() {
       <ScrollView
         contentContainerStyle={[
           styles.scroll,
-          { paddingBottom: AD_BANNER_HEIGHT + spacing.lg },
+          { paddingBottom: insets.bottom + spacing.lg },
         ]}
         showsVerticalScrollIndicator={false}
       >
@@ -169,9 +171,9 @@ export default function DashboardScreen() {
             </Pressable>
           </Card>
         )}
-      </ScrollView>
 
-      <AdBanner />
+        <AdBanner />
+      </ScrollView>
     </View>
   );
 }

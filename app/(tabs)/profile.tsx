@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, View, useColorScheme } from 'react-native';
 import { router } from 'expo-router';
 import { differenceInMonths, differenceInYears, parseISO } from 'date-fns';
-import { getColors, radii, spacing, AD_BANNER_HEIGHT } from '@/constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getColors, radii, spacing } from '@/constants/theme';
 import { AdBanner } from '@/components/ui/AdBanner';
 import { Card } from '@/components/ui/Card';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -107,6 +108,7 @@ export default function ProfileScreen() {
   const colors = getColors(scheme);
   const [isEditing, setIsEditing] = useState(false);
 
+  const insets = useSafeAreaInsets();
   const { profile, isLoading: profileLoading } = useProfile();
   const { mutate: saveProfile, isPending: isSaving } = useSaveProfile();
   const { reminders, isLoading: remindersLoading, resetReminderDate } = useReminders();
@@ -124,7 +126,6 @@ export default function ProfileScreen() {
           <Skeleton height={80} borderRadius={16} />
           <Skeleton height={80} borderRadius={16} />
         </View>
-        <AdBanner />
       </View>
     );
   }
@@ -134,7 +135,7 @@ export default function ProfileScreen() {
       <ScrollView
         contentContainerStyle={[
           styles.scroll,
-          { paddingBottom: AD_BANNER_HEIGHT + spacing.lg },
+          { paddingBottom: insets.bottom + spacing.lg },
         ]}
         showsVerticalScrollIndicator={false}
       >
@@ -211,9 +212,9 @@ export default function ProfileScreen() {
             ))
           )}
         </View>
-      </ScrollView>
 
-      <AdBanner />
+        <AdBanner />
+      </ScrollView>
     </View>
   );
 }

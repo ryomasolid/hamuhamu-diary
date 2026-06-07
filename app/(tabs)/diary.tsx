@@ -9,7 +9,8 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
-import { getColors, spacing, AD_BANNER_HEIGHT, radii } from '@/constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getColors, spacing, radii } from '@/constants/theme';
 import { AdBanner } from '@/components/ui/AdBanner';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
@@ -62,6 +63,7 @@ function LoadingSkeleton() {
 export default function DiaryScreen() {
   const scheme = useColorScheme();
   const colors = getColors(scheme);
+  const insets = useSafeAreaInsets();
   const { records, isLoading, error } = useRecords();
   const { mutate: deleteRecord } = useDeleteRecord();
   const cleaningOptions = useCleaningOptions();
@@ -96,7 +98,6 @@ export default function DiaryScreen() {
     return (
       <View style={[styles.screen, { backgroundColor: colors.background }]}>
         <LoadingSkeleton />
-        <AdBanner />
       </View>
     );
   }
@@ -123,9 +124,10 @@ export default function DiaryScreen() {
         contentContainerStyle={[
           styles.list,
           records.length === 0 && styles.listEmpty,
-          { paddingBottom: AD_BANNER_HEIGHT + spacing.lg },
+          { paddingBottom: insets.bottom + spacing.lg },
         ]}
         ListEmptyComponent={<EmptyState />}
+        ListFooterComponent={records.length > 0 ? <AdBanner /> : null}
         refreshControl={
           <RefreshControl
             refreshing={false}
@@ -143,6 +145,7 @@ export default function DiaryScreen() {
           style={({ pressed }) => [
             styles.fab,
             {
+              bottom: insets.bottom + spacing.lg,
               backgroundColor: colors.primary,
               shadowColor: colors.primary,
               opacity: pressed ? 0.85 : 1,
@@ -156,8 +159,6 @@ export default function DiaryScreen() {
           </Text>
         </Pressable>
       )}
-
-      <AdBanner />
     </View>
   );
 }
@@ -200,7 +201,6 @@ const styles = StyleSheet.create({
   },
   fab: {
     position: 'absolute',
-    bottom: AD_BANNER_HEIGHT + spacing.lg,
     right: spacing.lg,
     width: 56,
     height: 56,

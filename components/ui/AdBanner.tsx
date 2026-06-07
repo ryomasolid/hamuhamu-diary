@@ -1,32 +1,25 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 import { IOS_BANNER_AD_UNIT_ID } from '@/constants/ads';
 
+const SCREENSHOT_MODE = false; // スクショ撮影時はtrueに
+
 const adUnitId = __DEV__ ? TestIds.BANNER : IOS_BANNER_AD_UNIT_ID;
 
-interface AdBannerProps {
-  respectSafeArea?: boolean;
-}
-
-export function AdBanner({ respectSafeArea = false }: AdBannerProps) {
-  const insets = useSafeAreaInsets();
+export function AdBanner() {
+  if (SCREENSHOT_MODE) return null;
 
   return (
-    <View
-      style={[
-        styles.container,
-        { paddingBottom: respectSafeArea ? insets.bottom : 0 },
-      ]}
-    >
-      <BannerAd unitId={adUnitId} size={BannerAdSize.LARGE_ANCHORED_ADAPTIVE_BANNER} />
+    <View style={styles.container}>
+      <BannerAd unitId={adUnitId} size={BannerAdSize.INLINE_ADAPTIVE_BANNER} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    width: '100%',
     alignItems: 'center',
     backgroundColor: '#F0F0F0',
   },

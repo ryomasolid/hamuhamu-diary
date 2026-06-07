@@ -310,9 +310,9 @@ export default function RecordScreen() {
               fullWidth
             />
           </View>
-        </ScrollView>
 
-        <AdBanner respectSafeArea />
+          <AdBanner />
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
