@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>はむはむ日記 — ハムスターの飼育日記アプリ</title>
+  <meta name="description" content="大切なハムスターとの毎日を、かわいく・かんたんに記録しよう。体重・エサ・お掃除を1画面で記録。同居人とのデータ共有にも対応。" />
+  <meta property="og:title" content="はむはむ日記" />
+  <meta property="og:description" content="ハムスターのお世話を、かわいく・かんたんに記録するiOSアプリ" />
+  <meta property="og:type" content="website" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --primary: #E8804A;
+      --primary-dark: #B85E2A;
+      --bg: #FFF8F0;
+      --bg2: #FFF0E5;
+      --surface: #FFFFFF;
+      --text: #2D2420;
+      --text2: #8C7B6E;
+      --border: #E8DDD3;
+    }
+
+    body {
+      font-family: -apple-system, 'Helvetica Neue', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(160deg, #FFF3EC 0%, var(--bg2) 100%);
+      text-align: center;
+      padding: 72px 24px 64px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .app-icon {
+      width: 120px;
+      height: 120px;
+      border-radius: 26px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      margin-bottom: 24px;
+      background: var(--primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 56px;
+    }
+
+    .hero h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .hero .tagline {
+      font-size: 1.1rem;
+      color: var(--text2);
+      margin-bottom: 36px;
+      max-width: 440px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .badge {
+      display: inline-block;
+    }
+
+    .badge img {
+      height: 52px;
+    }
+
+    .badge-placeholder {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--text);
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 14px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    /* ── Features ── */
+    .section {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 64px 24px;
+    }
+
+    .section-label {
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+
+    .section h2 {
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 48px;
+      letter-spacing: -0.3px;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 24px;
+    }
+
+    .feature-icon {
+      font-size: 2rem;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .feature-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .feature-card p {
+      font-size: 0.88rem;
+      color: var(--text2);
+      line-height: 1.6;
+    }
+
+    /* ── Divider section ── */
+    .highlight {
+      background: linear-gradient(135deg, var(--primary) 0%, #FF8C50 100%);
+      color: #fff;
+      text-align: center;
+      padding: 64px 24px;
+    }
+
+    .highlight h2 {
+      font-size: 1.7rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .highlight p {
+      font-size: 1rem;
+      opacity: 0.9;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--text);
+      color: rgba(255, 255, 255, 0.6);
+      text-align: center;
+      padding: 40px 24px;
+      font-size: 0.82rem;
+    }
+
+    footer a {
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      margin: 0 12px;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    footer .footer-links {
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 480px) {
+      .hero h1 {
+        font-size: 1.9rem;
+      }
+
+      .section h2 {
+        font-size: 1.4rem;
+      }
+
+      .highlight h2 {
+        font-size: 1.4rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="app-icon">🐹</div>
+    <h1>はむはむ日記</h1>
+    <p class="tagline">大切なハムスターとの毎日を、<br>かわいく・かんたんに記録しよう</p>
+    <a class="badge-placeholder" href="https://apps.apple.com/jp/app/id000000000" target="_blank" rel="noopener">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+        <path
+          d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+      </svg>
+      App Store でダウンロード
+    </a>
+  </section>
+
+  <!-- Features -->
+  <section class="section">
+    <p class="section-label">Features</p>
+    <h2>ハムスターのお世話を<br>もっとたのしく</h2>
+    <div class="features">
+      <div class="feature-card">
+        <span class="feature-icon">📋</span>
+        <h3>毎日の記録がサクッと</h3>
+        <p>体重・エサ・お掃除・メモを1画面でまとめて入力。テンプレート登録でタップ1つ。</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📷</span>
+        <h3>写真つきで残せる</h3>
+        <p>その日の様子を写真と一緒に記録。日記一覧でかわいい思い出をいつでも振り返れる。</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔔</span>
+        <h3>お世話のサイクル管理</h3>
+        <p>床材交換・フィルター交換などのリマインダーで、ケアの頻度を忘れず管理。</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📤</span>
+        <h3>同居人と共有できる</h3>
+        <p>AirDropやLINEで日記データを丸ごと共有。写真も含めて完全転送、自動でマージ。</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🌙</span>
+        <h3>ダークモード対応</h3>
+        <p>夜中のお世話確認もやさしい表示で。システムの設定に合わせて自動切替。</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔒</span>
+        <h3>オフライン完結</h3>
+        <p>データはすべて端末内に保存。アカウント登録不要、ネット接続なしで使える。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Highlight -->
+  <section class="highlight">
+    <h2>ふたりで育てても、<br>記録はひとつに 🐹</h2>
+    <p>同居人それぞれのスマホで記録した日記を、AirDropで送り合うだけ。日付ごとに自動でマージされるから、同じ日の記録が重複することもありません。</p>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-links">
+      <a href="https://github.com/ryomasolid/hamuhamu-diary/issues" target="_blank" rel="noopener">サポート・お問い合わせ</a>
+      <a href="privacy.html">プライバシーポリシー</a>
+    </div>
+    <p>© 2026 Daichi — はむはむ日記</p>
+  </footer>
+
+</body>
+
+</html>
