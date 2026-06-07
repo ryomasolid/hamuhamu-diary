@@ -11,6 +11,7 @@ interface ReminderStore {
   setHasHydrated: (state: boolean) => void;
   resetReminderDate: (id: string) => void;
   updateReminder: (id: string, updates: Partial<Reminder>) => void;
+  setReminders: (reminders: Reminder[]) => void;
 }
 
 export const useReminderStore = create<ReminderStore>()(
@@ -36,6 +37,8 @@ export const useReminderStore = create<ReminderStore>()(
             r.id === id ? { ...r, ...updates } : r,
           ),
         })),
+
+      setReminders: (reminders) => set({ reminders }),
     }),
     {
       name: 'hamu-reminders',

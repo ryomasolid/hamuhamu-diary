@@ -10,6 +10,7 @@ interface RecordStore {
   addRecord: (record: DailyRecord) => void;
   updateRecord: (id: string, updates: Partial<Omit<DailyRecord, 'id' | 'createdAt'>>) => void;
   deleteRecord: (id: string) => void;
+  setRecords: (records: DailyRecord[]) => void;
   getLatestRecord: () => DailyRecord | null;
   getLastCleaningDate: () => string | null;
 }
@@ -38,6 +39,8 @@ export const useRecordStore = create<RecordStore>()(
         set((state) => ({
           records: state.records.filter((r) => r.id !== id),
         })),
+
+      setRecords: (records) => set({ records }),
 
       getLatestRecord: () => {
         const { records } = get();
