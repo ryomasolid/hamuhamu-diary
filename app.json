@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "bundleIdentifier": "com.ryomasolid.hamuhamudiary",
-      "buildNumber": "2",
+      "buildNumber": "3",
       "supportsTablet": false,
       "infoPlist": {
         "CFBundleDisplayName": "はむ日記",
@@ -40,8 +40,7 @@
         {
           "iosAppId": "ca-app-pub-3362493734697220~7622911129"
         }
-      ],
-      "expo-tracking-transparency"
+      ]
     ],
     "experiments": {
       "typedRoutes": true
