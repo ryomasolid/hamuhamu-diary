@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Alert, Pressable, StyleSheet, View, useColorScheme } from 'react-native';
+import { useInterstitialAd, TestIds } from 'react-native-google-mobile-ads';
+import { IOS_INTERSTITIAL_AD_UNIT_ID } from '@/constants/ads';
 import { router } from 'expo-router';
 import { BaseLayout } from '@/components/BaseLayout';
 import { Card } from '@/components/ui/Card';
 import { Text } from '@/components/ui/Text';
 import { getColors, spacing } from '@/constants/theme';
+
+const INTERSTITIAL_AD_UNIT_ID = __DEV__ ? TestIds.INTERSTITIAL : IOS_INTERSTITIAL_AD_UNIT_ID;
 import {
   exportAndShare,
   pickBackupFile,
@@ -54,18 +58,52 @@ export default function SettingsScreen() {
   const setRecords = useRecordStore((s) => s.setRecords);
   const setReminders = useReminderStore((s) => s.setReminders);
 
-  const handleExport = async () => {
-    try {
-      setIsExporting(true);
-      await exportAndShare();
-    } catch {
-      Alert.alert('エラー', 'データの書き出しに失敗しました。');
-    } finally {
-      setIsExporting(false);
+  const { isLoaded: isAdLoaded, isClosed: isAdClosed, load: loadAd, show: showAd } =
+    useInterstitialAd(INTERSTITIAL_AD_UNIT_ID);
+
+  const pendingAction = useRef<(() => void) | null>(null);
+
+  useEffect(() => { loadAd(); }, []);
+
+  // 広告を閉じたら保留中の処理を実行し、次回用に再ロード
+  useEffect(() => {
+    if (isAdClosed) {
+      const action = pendingAction.current;
+      pendingAction.current = null;
+      loadAd();
+      action?.();
+    }
+  }, [isAdClosed]);
+
+  const showAdThen = (action: () => void) => {
+    if (isAdLoaded) {
+      pendingAction.current = action;
+      showAd();
+    } else {
+      action();
     }
   };
 
-  const handleImport = async () => {
+  const handleExport = () => {
+    showAdThen(() => {
+      void (async () => {
+        try {
+          setIsExporting(true);
+          await exportAndShare();
+        } catch {
+          Alert.alert('エラー', 'データの書き出しに失敗しました。');
+        } finally {
+          setIsExporting(false);
+        }
+      })();
+    });
+  };
+
+  const handleImport = () => {
+    showAdThen(() => { void doImport(); });
+  };
+
+  const doImport = async () => {
     try {
       setIsImporting(true);
       const data = await pickBackupFile();
