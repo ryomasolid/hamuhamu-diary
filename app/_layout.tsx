@@ -6,6 +6,7 @@ import { useColorScheme } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryClientProvider } from '@tanstack/react-query';
 import mobileAds from 'react-native-google-mobile-ads';
+import { requestTrackingPermissionsAsync } from 'expo-tracking-transparency';
 import { getColors } from '@/constants/theme';
 import { queryClient } from '@/lib/queryClient';
 import { useAppOpenAd } from '@/hooks/useAppOpenAd';
@@ -21,6 +22,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     const init = async () => {
+      await requestTrackingPermissionsAsync();
       await mobileAds().setRequestConfiguration({
         testDeviceIdentifiers: [
           // 自分のデバイスIDをここに追加（Xcodeログに "To get test ads on this device" として表示される）
