@@ -99,6 +99,7 @@ npm start
 |---|---|
 | `npm run build:dev` | 開発用ビルド（expo-dev-client入り） |
 | `npm run build:preview` | 社内テスト配布用ビルド |
+// 以下実行前にapp.jsonのversionをインクリメント
 | `npm run build:prod` | App Store申請用ビルド |
 | `npm run submit:prod` | App Storeへ提出 |
 
