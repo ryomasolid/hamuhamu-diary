@@ -15,6 +15,13 @@ interface RecordStore {
   getLastCleaningDate: () => string | null;
 }
 
+// date(YYYY-MM-DD)の降順、同日ならcreatedAtの降順で並べる
+const sortByDateDesc = (records: DailyRecord[]) =>
+  [...records].sort(
+    (a, b) =>
+      b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt),
+  );
+
 export const useRecordStore = create<RecordStore>()(
   persist(
     (set, get) => ({
@@ -24,14 +31,18 @@ export const useRecordStore = create<RecordStore>()(
       setHasHydrated: (state) => set({ _hasHydrated: state }),
 
       addRecord: (record) =>
-        set((state) => ({ records: [record, ...state.records] })),
+        set((state) => ({
+          records: sortByDateDesc([record, ...state.records]),
+        })),
 
       updateRecord: (id, updates) =>
         set((state) => ({
-          records: state.records.map((r) =>
-            r.id === id
-              ? { ...r, ...updates, updatedAt: new Date().toISOString() }
-              : r,
+          records: sortByDateDesc(
+            state.records.map((r) =>
+              r.id === id
+                ? { ...r, ...updates, updatedAt: new Date().toISOString() }
+                : r,
+            ),
           ),
         })),
 
@@ -40,7 +51,7 @@ export const useRecordStore = create<RecordStore>()(
           records: state.records.filter((r) => r.id !== id),
         })),
 
-      setRecords: (records) => set({ records }),
+      setRecords: (records) => set({ records: sortByDateDesc(records) }),
 
       getLatestRecord: () => {
         const { records } = get();
@@ -57,7 +68,11 @@ export const useRecordStore = create<RecordStore>()(
       name: 'hamu-records',
       storage: createJSONStorage(() => AsyncStorage),
       onRehydrateStorage: () => (state) => {
-        state?.setHasHydrated(true);
+        if (state) {
+          // 過去バージョンで保存された未ソートのデータを並べ直す
+          state.setRecords(state.records);
+          state.setHasHydrated(true);
+        }
       },
     },
   ),

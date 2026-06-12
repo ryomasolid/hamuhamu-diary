@@ -53,6 +53,9 @@ export function RecordCard({ record, cleaningOptions, onDelete, onPress }: Recor
           <View style={styles.headerRight}>
             {record.weight != null && (
               <View style={styles.weightBadge}>
+                <Text variant="caption" color={colors.textSecondary} style={{ marginRight: 4 }}>
+                  体重
+                </Text>
                 <Text variant="h4" weight="bold" color={colors.primary}>
                   {record.weight}
                 </Text>
