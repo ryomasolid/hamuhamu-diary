@@ -2,13 +2,14 @@
   "expo": {
     "name": "はむはむ日記",
     "slug": "hamuhamu-diary",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "ios": {
       "bundleIdentifier": "com.ryomasolid.hamuhamudiary",
+      "buildNumber": "1",
       "supportsTablet": false,
       "infoPlist": {
         "CFBundleDisplayName": "はむ日記",
