@@ -4,7 +4,7 @@
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start --dev-client --tunnel",
-    "ios": "expo start --ios",
+    "ios": "expo run:ios",
     "lint": "eslint . --ext .ts,.tsx",
     "type-check": "tsc --noEmit",
     "build:dev": "eas build --profile development --platform ios",
