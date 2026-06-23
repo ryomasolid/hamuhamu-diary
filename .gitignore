@@ -2,6 +2,7 @@ node_modules/
 .expo/
 ios/
 android/
+*.ipa
 dist/
 web-build/
 *.jks
