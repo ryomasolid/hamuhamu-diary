@@ -1,6 +1,7 @@
 import { File, Paths } from 'expo-file-system';
 import { Share } from 'react-native';
 import { format } from 'date-fns';
+import { resolvePhotoUri, saveBase64Photo } from '@/lib/photos';
 import { useRecordStore } from '@/store/recordStore';
 import { useProfileStore } from '@/store/profileStore';
 import { useReminderStore } from '@/store/reminderStore';
@@ -35,18 +36,14 @@ export interface MergeResult {
   skippedCount: number;
 }
 
-async function readPhotoAsBase64(uri: string): Promise<string | null> {
+async function readPhotoAsBase64(storedUri: string): Promise<string | null> {
   try {
-    return await new File(uri).base64();
+    const resolved = resolvePhotoUri(storedUri);
+    if (resolved == null) return null;
+    return await new File(resolved).base64();
   } catch {
     return null;
   }
-}
-
-function saveBase64Photo(base64: string, recordId: string): string {
-  const file = new File(Paths.document, `hamuhamu-photo-${recordId}.jpg`);
-  file.write(base64, { encoding: 'base64' });
-  return file.uri;
 }
 
 export async function exportAndShare(): Promise<void> {

@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
 import { DateSelector } from '@/components/record/DateSelector';
 import { HAMSTER_SPECIES } from '@/constants/defaults';
+import { persistPhoto, resolvePhotoUri } from '@/lib/photos';
 import type { HamsterProfile } from '@/types';
 
 const profileSchema = z.object({
@@ -97,7 +98,9 @@ function PhotoPicker({
       quality: 0.8,
     });
     if (!result.canceled && result.assets[0]) {
-      onChange(result.assets[0].uri);
+      // 永続領域へコピーし、相対パスを保存する
+      const stored = await persistPhoto(result.assets[0].uri);
+      onChange(stored);
     }
   };
 
@@ -122,7 +125,7 @@ function PhotoPicker({
         ]}
       >
         {photoUri != null ? (
-          <Image source={{ uri: photoUri }} style={styles.photoImage} />
+          <Image source={{ uri: resolvePhotoUri(photoUri) ?? undefined }} style={styles.photoImage} />
         ) : (
           <Text style={styles.photoEmoji}>🐹</Text>
         )}

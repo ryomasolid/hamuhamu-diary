@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -9,16 +9,12 @@ import mobileAds from 'react-native-google-mobile-ads';
 import { requestTrackingPermissionsAsync } from 'expo-tracking-transparency';
 import { getColors } from '@/constants/theme';
 import { queryClient } from '@/lib/queryClient';
-import { useAppOpenAd } from '@/hooks/useAppOpenAd';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const scheme = useColorScheme();
   const colors = getColors(scheme);
-  const [adsReady, setAdsReady] = useState(false);
-
-  useAppOpenAd(adsReady);
 
   useEffect(() => {
     const init = async () => {
@@ -30,7 +26,6 @@ export default function RootLayout() {
         ],
       });
       await mobileAds().initialize();
-      setAdsReady(true);
       await SplashScreen.hideAsync();
     };
     void init();

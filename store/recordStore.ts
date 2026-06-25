@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { migratePhotoValue } from '@/lib/photos';
 import type { DailyRecord } from '@/types';
 
 interface RecordStore {
@@ -69,8 +70,13 @@ export const useRecordStore = create<RecordStore>()(
       storage: createJSONStorage(() => AsyncStorage),
       onRehydrateStorage: () => (state) => {
         if (state) {
-          // 過去バージョンで保存された未ソートのデータを並べ直す
-          state.setRecords(state.records);
+          // 旧バージョンで絶対パス保存された写真を相対パスへ移行しつつ、
+          // 未ソートのデータを並べ直す
+          const migrated = state.records.map((r) => {
+            const photoUri = migratePhotoValue(r.photoUri);
+            return photoUri === r.photoUri ? r : { ...r, photoUri };
+          });
+          state.setRecords(migrated);
           state.setHasHydrated(true);
         }
       },

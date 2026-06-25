@@ -13,6 +13,7 @@ import { StatusSummary } from '@/components/dashboard/StatusSummary';
 import { useLatestRecord, useRecords } from '@/hooks/useRecords';
 import { useProfile } from '@/hooks/useProfile';
 import { useRecordStore } from '@/store/recordStore';
+import { resolvePhotoUri } from '@/lib/photos';
 import type { DailyRecord } from '@/types';
 
 function RecordButton() {
@@ -64,7 +65,7 @@ function PhotoMemory({ record }: { record: DailyRecord }) {
       >
         <View style={[styles.photoCard, { borderRadius: radii.lg, backgroundColor: colors.surfaceSecondary }]}>
           <Image
-            source={{ uri: record.photoUri! }}
+            source={{ uri: resolvePhotoUri(record.photoUri) ?? undefined }}
             style={[styles.photoImage, { borderRadius: radii.lg }]}
             resizeMode="cover"
           />
@@ -129,7 +130,7 @@ export default function DashboardScreen() {
               ]}
             >
               {profile.photoUri != null ? (
-                <Image source={{ uri: profile.photoUri }} style={styles.heroAvatarImage} />
+                <Image source={{ uri: resolvePhotoUri(profile.photoUri) ?? undefined }} style={styles.heroAvatarImage} />
               ) : (
                 <Text style={styles.heroAvatarEmoji}>🐹</Text>
               )}
