@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { migratePhotoValue } from '@/lib/photos';
 import type { HamsterProfile, PresetMeal, SingleFood, CleaningOption } from '@/types';
 import {
   DEFAULT_CLEANING_OPTIONS,
@@ -125,7 +126,16 @@ export const useProfileStore = create<ProfileStore>()(
       name: 'hamu-profile',
       storage: createJSONStorage(() => AsyncStorage),
       onRehydrateStorage: () => (state) => {
-        state?.setHasHydrated(true);
+        if (state) {
+          // 旧バージョンで絶対パス保存された写真を相対パスへ移行
+          if (state.profile) {
+            const photoUri = migratePhotoValue(state.profile.photoUri);
+            if (photoUri !== state.profile.photoUri) {
+              state.setProfile({ ...state.profile, photoUri });
+            }
+          }
+          state.setHasHydrated(true);
+        }
       },
     },
   ),

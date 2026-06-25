@@ -13,6 +13,7 @@ import { ProfileForm } from '@/components/profile/ProfileForm';
 import { ReminderCard } from '@/components/profile/ReminderCard';
 import { useProfile, useSaveProfile } from '@/hooks/useProfile';
 import { useReminders } from '@/hooks/useReminders';
+import { resolvePhotoUri } from '@/lib/photos';
 import type { HamsterProfile } from '@/types';
 
 function calculateAge(birthDate: string): string {
@@ -48,7 +49,7 @@ function ProfileHeaderCard({
         >
           {profile.photoUri != null ? (
             <Image
-              source={{ uri: profile.photoUri }}
+              source={{ uri: resolvePhotoUri(profile.photoUri) ?? undefined }}
               style={styles.avatarImage}
             />
           ) : (

@@ -11,6 +11,7 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import { getColors, fontSizes, radii, spacing } from '@/constants/theme';
 import { Text } from '@/components/ui/Text';
+import { persistPhoto, resolvePhotoUri } from '@/lib/photos';
 
 interface MemoInputProps {
   memo: string;
@@ -43,7 +44,9 @@ export function MemoInput({
       quality: 0.8,
     });
     if (!result.canceled && result.assets[0]) {
-      onPhotoChange(result.assets[0].uri);
+      // 永続領域へコピーし、相対パスを保存する
+      const stored = await persistPhoto(result.assets[0].uri);
+      onPhotoChange(stored);
     }
   };
 
@@ -60,7 +63,7 @@ export function MemoInput({
       {photoUri !== null ? (
         <Pressable onPress={removePhoto}>
           <Image
-            source={{ uri: photoUri }}
+            source={{ uri: resolvePhotoUri(photoUri) ?? undefined }}
             style={[styles.photo, { borderRadius: radii.md }]}
             resizeMode="cover"
           />
