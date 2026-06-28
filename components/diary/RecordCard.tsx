@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Text } from '@/components/ui/Text';
 import type { DailyRecord } from '@/types';
 import type { CleaningOption } from '@/types';
+import { resolvePhotoUri } from '@/lib/photos';
 
 interface RecordCardProps {
   record: DailyRecord;
@@ -76,7 +77,7 @@ export function RecordCard({ record, cleaningOptions, onDelete, onPress }: Recor
         {record.photoUri != null && (
           <View style={[styles.section, { borderTopColor: colors.border }]}>
             <Image
-              source={{ uri: record.photoUri }}
+              source={{ uri: resolvePhotoUri(record.photoUri) ?? undefined }}
               style={[styles.photo, { borderRadius: radii.md }]}
               resizeMode="cover"
             />
