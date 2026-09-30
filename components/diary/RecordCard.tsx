@@ -15,9 +15,10 @@ interface RecordCardProps {
   cleaningOptions: CleaningOption[];
   onDelete: (id: string) => void;
   onPress?: () => void;
+  onShare?: () => void;
 }
 
-export function RecordCard({ record, cleaningOptions, onDelete, onPress }: RecordCardProps) {
+export function RecordCard({ record, cleaningOptions, onDelete, onPress, onShare }: RecordCardProps) {
   const scheme = useColorScheme();
   const colors = getColors(scheme);
 
@@ -64,6 +65,19 @@ export function RecordCard({ record, cleaningOptions, onDelete, onPress }: Recor
                   g
                 </Text>
               </View>
+            )}
+            {onShare && (
+              <Pressable
+                onPress={onShare}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel="この記録をシェア"
+                style={[styles.shareBtn, { backgroundColor: colors.surfaceSecondary, borderRadius: radii.full }]}
+              >
+                <Text variant="caption" weight="semibold" color={colors.primary}>
+                  シェア
+                </Text>
+              </Pressable>
             )}
             {onPress && (
               <Text variant="caption" color={colors.textTertiary} style={{ marginLeft: spacing.sm }}>
@@ -136,6 +150,11 @@ const styles = StyleSheet.create({
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  shareBtn: {
+    marginLeft: spacing.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
   },
   weightBadge: {
     flexDirection: 'row',

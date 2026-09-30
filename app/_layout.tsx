@@ -9,15 +9,24 @@ import mobileAds from 'react-native-google-mobile-ads';
 import { requestTrackingPermissionsAsync } from 'expo-tracking-transparency';
 import { getColors } from '@/constants/theme';
 import { queryClient } from '@/lib/queryClient';
+import { useNotificationSync } from '@/hooks/useNotificationSync';
+import { SCREENSHOT_MODE } from '@/constants/app';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const scheme = useColorScheme();
   const colors = getColors(scheme);
+  useNotificationSync();
 
   useEffect(() => {
     const init = async () => {
+      if (SCREENSHOT_MODE) {
+        const { seedDemoData } = await import('@/lib/demoSeed');
+        await seedDemoData();
+        await SplashScreen.hideAsync();
+        return;
+      }
       await requestTrackingPermissionsAsync();
       await mobileAds().setRequestConfiguration({
         testDeviceIdentifiers: [
@@ -48,6 +57,14 @@ export default function RootLayout() {
               presentation: 'modal',
               headerShown: false,
               animation: 'slide_from_bottom',
+              contentStyle: { backgroundColor: colors.background },
+            }}
+          />
+          <Stack.Screen
+            name="share-card"
+            options={{
+              presentation: 'modal',
+              headerShown: false,
               contentStyle: { backgroundColor: colors.background },
             }}
           />

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Alert, Pressable, StyleSheet, View, useColorScheme } from 'react-native';
+import { Alert, Linking, Pressable, Share, StyleSheet, View, useColorScheme } from 'react-native';
+import Constants from 'expo-constants';
 import { useInterstitialAd, TestIds } from 'react-native-google-mobile-ads';
 import { IOS_INTERSTITIAL_AD_UNIT_ID } from '@/constants/ads';
 import { router } from 'expo-router';
@@ -7,6 +8,8 @@ import { BaseLayout } from '@/components/BaseLayout';
 import { Card } from '@/components/ui/Card';
 import { Text } from '@/components/ui/Text';
 import { getColors, spacing } from '@/constants/theme';
+import { APP_SHARE_MESSAGE, APP_STORE_REVIEW_URL } from '@/constants/app';
+import { NotificationSettings } from '@/components/settings/NotificationSettings';
 
 const INTERSTITIAL_AD_UNIT_ID = __DEV__ ? TestIds.INTERSTITIAL : IOS_INTERSTITIAL_AD_UNIT_ID;
 import {
@@ -210,18 +213,38 @@ export default function SettingsScreen() {
         />
       </Card>
 
+      <Card style={styles.card}>
+        <Text variant="h4" weight="semibold" style={{ marginBottom: spacing.xs }}>
+          通知
+        </Text>
+        <NotificationSettings />
+      </Card>
+
+      <Card style={styles.card}>
+        <Text variant="h4" weight="semibold" style={{ marginBottom: spacing.xs }}>
+          はむはむ日記を応援する
+        </Text>
+        <NavRow
+          emoji="⭐️"
+          label="レビューを書く"
+          description="いただいた声を次のアップデートに活かします"
+          onPress={() => void Linking.openURL(APP_STORE_REVIEW_URL)}
+        />
+        <NavRow
+          emoji="💌"
+          label="ハム友にすすめる"
+          description="LINEやSNSでアプリを紹介"
+          onPress={() => void Share.share({ message: APP_SHARE_MESSAGE })}
+        />
+      </Card>
+
       <Card style={styles.card} elevated={false} bordered>
         <Text variant="h4" weight="semibold" style={{ marginBottom: spacing.sm }}>
           アプリ情報
         </Text>
         <View style={styles.infoRow}>
           <Text variant="label" color={colors.textSecondary}>バージョン</Text>
-          <Text variant="label" weight="medium">1.0.0</Text>
-        </View>
-        <View style={[styles.divider, { backgroundColor: colors.border }]} />
-        <View style={styles.infoRow}>
-          <Text variant="label" color={colors.textSecondary}>ビルド</Text>
-          <Text variant="label" weight="medium">1</Text>
+          <Text variant="label" weight="medium">{Constants.expoConfig?.version ?? '-'}</Text>
         </View>
       </Card>
     </BaseLayout>
@@ -246,5 +269,4 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: spacing.xs,
   },
-  divider: { height: 1, marginVertical: spacing.sm },
 });

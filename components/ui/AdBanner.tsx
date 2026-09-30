@@ -2,8 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 import { IOS_BANNER_AD_UNIT_ID } from '@/constants/ads';
-
-const SCREENSHOT_MODE = false; // スクショ撮影時はtrueに
+import { SCREENSHOT_MODE } from '@/constants/app';
 
 const adUnitId = __DEV__ ? TestIds.BANNER : IOS_BANNER_AD_UNIT_ID;
 
