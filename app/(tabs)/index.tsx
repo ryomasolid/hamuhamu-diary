@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, View, useColorScheme } from 'react-native';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { format, parseISO } from 'date-fns';
 import { ja } from 'date-fns/locale/ja';
 import * as Haptics from 'expo-haptics';
@@ -14,6 +14,7 @@ import { useLatestRecord, useRecords } from '@/hooks/useRecords';
 import { useProfile } from '@/hooks/useProfile';
 import { useRecordStore } from '@/store/recordStore';
 import { resolvePhotoUri } from '@/lib/photos';
+import { maybeRequestReview } from '@/lib/review';
 import type { DailyRecord } from '@/types';
 
 function RecordButton() {
@@ -79,6 +80,17 @@ function PhotoMemory({ record }: { record: DailyRecord }) {
               </Text>
             )}
           </View>
+          <Pressable
+            onPress={() => router.push({ pathname: '/share-card', params: { id: record.id } })}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel="この写真をシェア"
+            style={[styles.photoShare, { borderRadius: radii.full }]}
+          >
+            <Text variant="caption" weight="bold" color={colors.primary}>
+              📤 シェア
+            </Text>
+          </Pressable>
         </View>
       </Pressable>
     </View>
@@ -96,6 +108,15 @@ export default function DashboardScreen() {
 
   const today = format(new Date(), 'yyyy年M月d日（EEE）', { locale: ja });
   const greeting = profile?.name ? `${profile.name}の今日のお世話` : '今日のお世話';
+
+  // 記録を保存してホームに戻ってきたタイミングでレビュー依頼を判定する
+  const recordCount = records.length;
+  useFocusEffect(
+    useCallback(() => {
+      const timer = setTimeout(() => void maybeRequestReview(recordCount), 1500);
+      return () => clearTimeout(timer);
+    }, [recordCount]),
+  );
 
   const randomPhotoRecord = useMemo(() => {
     const withPhotos = records.filter((r) => r.photoUri != null);
@@ -236,6 +257,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     gap: 2,
+  },
+  photoShare: {
+    position: 'absolute',
+    top: spacing.sm,
+    right: spacing.sm,
+    backgroundColor: 'rgba(255,255,255,0.92)',
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
   },
   setupCard: {
     gap: spacing.sm,

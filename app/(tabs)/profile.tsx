@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, View, useColorScheme } from 'react-native';
 import { router } from 'expo-router';
-import { differenceInMonths, differenceInYears, parseISO } from 'date-fns';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getColors, radii, spacing } from '@/constants/theme';
 import { AdBanner } from '@/components/ui/AdBanner';
@@ -14,18 +13,10 @@ import { ReminderCard } from '@/components/profile/ReminderCard';
 import { useProfile, useSaveProfile } from '@/hooks/useProfile';
 import { useReminders } from '@/hooks/useReminders';
 import { resolvePhotoUri } from '@/lib/photos';
+import { calculateAge } from '@/lib/age';
+import { enableWithPermission } from '@/components/settings/NotificationSettings';
+import { useNotificationStore } from '@/store/notificationStore';
 import type { HamsterProfile } from '@/types';
-
-function calculateAge(birthDate: string): string {
-  const birth = parseISO(birthDate);
-  const now = new Date();
-  const years = differenceInYears(now, birth);
-  const months = differenceInMonths(now, birth) - years * 12;
-  if (years === 0 && months === 0) return '0ヶ月';
-  if (years === 0) return `${months}ヶ月`;
-  if (months === 0) return `${years}歳`;
-  return `${years}歳${months}ヶ月`;
-}
 
 function ProfileHeaderCard({
   profile,
@@ -113,6 +104,13 @@ export default function ProfileScreen() {
   const { profile, isLoading: profileLoading } = useProfile();
   const { mutate: saveProfile, isPending: isSaving } = useSaveProfile();
   const { reminders, isLoading: remindersLoading, resetReminderDate } = useReminders();
+  const remindersEnabled = useNotificationStore((s) => s.remindersEnabled);
+  const notificationHydrated = useNotificationStore((s) => s._hasHydrated);
+  const setRemindersEnabled = useNotificationStore((s) => s.setRemindersEnabled);
+
+  const handleEnableReminderNotifications = async () => {
+    if (await enableWithPermission()) setRemindersEnabled(true);
+  };
 
   const handleSave = (data: HamsterProfile) => {
     saveProfile(data);
@@ -198,6 +196,25 @@ export default function ProfileScreen() {
             「リセット」を押すと交換日が今日に更新されます
           </Text>
 
+          {notificationHydrated && !remindersEnabled && (
+            <Pressable
+              onPress={() => void handleEnableReminderNotifications()}
+              style={({ pressed }) => [
+                styles.notifyCta,
+                {
+                  backgroundColor: colors.surfaceSecondary,
+                  borderColor: colors.primaryLight,
+                  borderRadius: radii.md,
+                  opacity: pressed ? 0.7 : 1,
+                },
+              ]}
+            >
+              <Text variant="label" weight="semibold" color={colors.primary}>
+                🔔 交換時期を通知で受け取る
+              </Text>
+            </Pressable>
+          )}
+
           {remindersLoading ? (
             <View style={{ gap: spacing.sm }}>
               <Skeleton height={100} borderRadius={16} />
@@ -268,5 +285,11 @@ const styles = StyleSheet.create({
   },
   chevron: {
     marginLeft: 'auto',
+  },
+  notifyCta: {
+    alignItems: 'center',
+    padding: spacing.sm,
+    borderWidth: 1,
+    marginBottom: spacing.md,
   },
 });

@@ -15,6 +15,7 @@ import { AdBanner } from '@/components/ui/AdBanner';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { RecordCard } from '@/components/diary/RecordCard';
+import { WeightChart } from '@/components/diary/WeightChart';
 import { useRecords, useDeleteRecord } from '@/hooks/useRecords';
 import { useCleaningOptions } from '@/hooks/useProfile';
 import type { DailyRecord } from '@/types';
@@ -87,6 +88,7 @@ export default function DiaryScreen() {
         cleaningOptions={cleaningOptions}
         onDelete={handleDelete}
         onPress={() => router.push({ pathname: '/record', params: { id: item.id } })}
+        onShare={() => router.push({ pathname: '/share-card', params: { id: item.id } })}
       />
     ),
     [cleaningOptions, handleDelete],
@@ -126,6 +128,7 @@ export default function DiaryScreen() {
           records.length === 0 && styles.listEmpty,
           { paddingBottom: insets.bottom + spacing.lg },
         ]}
+        ListHeaderComponent={<WeightChart records={records} />}
         ListEmptyComponent={<EmptyState />}
         ListFooterComponent={records.length > 0 ? <AdBanner /> : null}
         refreshControl={
